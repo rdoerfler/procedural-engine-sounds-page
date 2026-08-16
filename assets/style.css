@@ -1,0 +1,557 @@
+/* Three-family system: Raleway (subset, self-hosted) for headings, the
+   wordmark and measurement values, so the page reconnects to the poster's
+   own display face; a serif stack for prose, which is what makes a page of
+   dense measurement read as scholarly rather than as a product page; and a
+   monospace stack for every number, identifier, filename and unit, so data
+   never has to borrow a proportional font's ambiguous digit widths. No
+   third-party font host, no network request beyond this same origin: both
+   Raleway weights ship as subset .woff files under assets/fonts/. */
+@font-face {
+  font-family: "Raleway";
+  src: url("fonts/Raleway-Regular.woff") format("woff");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Raleway";
+  src: url("fonts/Raleway-SemiBold.woff") format("woff");
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  --font-heading: "Raleway", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-body: Charter, "Iowan Old Style", "Source Serif 4", Georgia, serif;
+  --font-mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --ink: #1A1C1E;
+  --muted: #687076;
+  --rule: #CED4D8;
+  --soft: #F0F4F5;
+  /* Series colours: RPM/torque, validated for tritan separation (~26 dE,
+     up from 7.1 on the old deep/green pair). --accent, the nav/focus/
+     "selected" colour, is deliberately the same hue as --rpm in light mode
+     rather than a third colour of its own -- one blue carries both "this is
+     the primary trace" and "this is active/current" here, so torque's
+     orange stays reserved for its own trace and never doubles as chrome.
+     (Dark mode breaks that link -- see the media query below.) --rpm-rgb/
+     --torque-rgb/--accent-rgb exist only so the luminous-accent box-shadows
+     below can build an rgba() without hard-coding a colour outside these
+     variables. */
+  --rpm: #0B63D6;
+  --rpm-rgb: 11, 99, 214;
+  --torque: #B45F00;
+  --torque-rgb: 180, 95, 0;
+  --accent: var(--rpm);
+  --accent-rgb: var(--rpm-rgb);
+  --bg: #FFFFFF;
+  --bg2: #F6F4EF;
+  --plate: var(--soft);
+  --plate2: #E7ECED;
+  --panel-shadow: 0 1px 0 rgba(255, 255, 255, 0.6) inset, 0 1px 2px rgba(26, 28, 30, 0.05);
+  --measure: 68ch;
+  --radius: 3px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --ink: #E6E9EA;
+    --muted: #9BA3A8;
+    --rule: #333A3F;
+    /* The exact neon pair from the reference page: ~10.3:1 and ~9.9:1
+       against this dark surface, so they read cleanly as data marks. The
+       same two colours measure only ~1.75:1 and ~1.83:1 against white --
+       far under the 3:1 floor for a graphical mark -- which is why light
+       mode above keeps its own calmer, validated pair instead. --accent
+       stays pinned to the old calmer blue here rather than following --rpm:
+       full-saturation cyan at this brightness reads as loud/neon when used
+       as chrome (a focus ring, a segmented-control glow, a nav underline)
+       rather than as a thin trace, so chrome keeps its previous, quieter
+       colour and only the two traces get the reference page's neon. */
+    --rpm: #4bd6e0;
+    --rpm-rgb: 75, 214, 224;
+    --torque: #ffb020;
+    --torque-rgb: 255, 176, 32;
+    --accent: #5B9DF9;
+    --accent-rgb: 91, 157, 249;
+    --bg: #141719;
+    --bg2: #1A1E22;
+    --plate: #1C2023;
+    --plate2: #23282C;
+    --panel-shadow: 0 1px 0 rgba(255, 255, 255, 0.03) inset, 0 6px 16px rgba(0, 0, 0, 0.28);
+  }
+}
+
+* { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  margin: 0;
+  /* A quiet vertical gradient rather than a flat fill -- just enough to keep
+     a long page of prose from reading as a single dead slab of colour. Two
+     stops of the same neighbourhood, not a spotlight: this is a research
+     page, not a product one. */
+  background: linear-gradient(180deg, var(--bg) 0%, var(--bg2) 100%);
+  color: var(--ink);
+  font-family: var(--font-body);
+  line-height: 1.65;
+}
+
+/* Quiet, sticky jump-list to the nine numbered sections below. It is plain
+   working anchors with no JavaScript at all -- the IntersectionObserver in
+   main.js only adds the current-section highlight on top of that, so a
+   no-JS visitor keeps a fully functional nav and just never sees the
+   highlight move. scroll-margin-top on main's sections (below) keeps a
+   jump target from landing underneath this bar. */
+#section-nav {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: var(--bg);
+  border-bottom: 1px solid var(--rule);
+}
+#section-nav .nav-scroll {
+  max-width: 76ch;
+  margin: 0 auto;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+#section-nav ul {
+  display: flex;
+  gap: 1.1rem;
+  list-style: none;
+  margin: 0;
+  padding: 0.55rem 1.25rem;
+  width: max-content;
+}
+#section-nav a {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.03em;
+  color: var(--muted);
+  text-decoration: none;
+  white-space: nowrap;
+  padding-bottom: 0.2rem;
+  border-bottom: 2px solid transparent;
+}
+#section-nav a:hover { color: var(--ink); }
+#section-nav a[aria-current="true"] { color: var(--ink); border-bottom-color: var(--accent); }
+
+h1, h2, h3 { font-family: var(--font-heading); font-weight: 600; line-height: 1.2; }
+
+/* padding-bottom is 3rem rather than the 6rem this had before the footer
+   existed: the closing colophon now supplies the page's bottom whitespace,
+   and stacking both left a dead band between the citation block and the
+   footer rule. */
+main { max-width: 76ch; margin: 0 auto; padding: 2.5rem 1.25rem 3rem; counter-reset: section figure; }
+
+/* Numbered sections read like a paper's table of contents: a mono index set
+   small and muted ahead of each heading does most of the "scientific" work
+   on its own, cheaply. Scoped to main's direct section children only, so the
+   per-set tab panels (also <section> elements, one level deeper) never pick
+   up a number of their own. */
+main > section { counter-increment: section; border-top: 1px solid var(--rule); margin-top: 4rem; padding-top: 3rem; scroll-margin-top: 3.25rem; }
+main > section:first-of-type { border-top: none; margin-top: 4.5rem; padding-top: 0; }
+main > section > h2 {
+  display: flex;
+  align-items: baseline;
+  gap: 0.7rem;
+  margin: 0 0 0.6rem;
+}
+main > section > h2::before {
+  content: counter(section, decimal-leading-zero);
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 400;
+  color: var(--muted);
+  letter-spacing: 0.04em;
+}
+main > section > h2 + p,
+main > section > h2 + ul {
+  margin-top: 0;
+}
+
+section > p, section > ul { max-width: var(--measure); }
+
+a { color: var(--ink); text-decoration-color: var(--rule); text-underline-offset: 0.15em; }
+a:hover { text-decoration-color: currentColor; }
+
+/* Hero: a title block first (title, authors, hairline), then what it is and
+   where to get it, then the measurement summary — a visitor should reach the
+   links without scrolling before they reach the numbers. */
+#hero .authors { color: var(--muted); font-family: var(--font-heading); margin-top: 0.3rem; }
+.hero-rule { border: none; border-top: 1px solid var(--rule); margin: 1.75rem 0; }
+
+.stat-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
+  gap: 0.75rem;
+  margin-top: 2rem;
+}
+.tile {
+  background: linear-gradient(180deg, var(--plate) 0%, var(--plate2) 100%);
+  box-shadow: var(--panel-shadow);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  padding: 0.9rem 1rem;
+}
+.tile .value {
+  font-family: var(--font-heading);
+  font-size: 1.6rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+.tile .label {
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-top: 0.15rem;
+}
+
+/* Downloads read as a measurement summary line, not a card: a total, then
+   its three named sources laid side by side with hairline dividers between
+   them. The total sums three platforms without deduplication, and one of
+   the sources is a third-party mirror, so both facts stay attached as a
+   caveat line underneath. */
+.downloads-strip {
+  background: linear-gradient(180deg, var(--plate) 0%, var(--plate2) 100%);
+  box-shadow: var(--panel-shadow);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  padding: 0.9rem 1.1rem 1rem;
+  margin-block: 0.75rem 2rem;
+}
+.downloads-head { display: flex; align-items: baseline; gap: 0.5rem; }
+.downloads-head .value {
+  font-family: var(--font-heading);
+  font-size: 1.6rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+.downloads-head .label {
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+.downloads-sources {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem 1.5rem;
+  margin-top: 0.75rem;
+}
+.downloads-source {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  padding-right: 1.5rem;
+  border-right: 1px solid var(--rule);
+}
+.downloads-source:last-child { padding-right: 0; border-right: none; }
+.downloads-source-label {
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+.downloads-source-value {
+  font-family: var(--font-heading);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  font-size: 1rem;
+}
+.downloads-note {
+  color: var(--muted);
+  font-size: 0.78rem;
+  margin: 0.75rem 0 0;
+  padding-top: 0.6rem;
+  border-top: 1px solid var(--rule);
+}
+
+table { border-collapse: collapse; width: 100%; font-size: 0.92rem; }
+th, td { text-align: left; padding: 0.5rem 0.65rem; border-bottom: 1px solid var(--rule); }
+th { font-family: var(--font-heading); font-weight: 600; font-size: 0.85rem; }
+#provenance table td:first-child,
+#provenance table td:nth-child(2) {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
+.table-scroll { overflow-x: auto; }
+
+/* Figures sit on a framed plate, like a printed page, each with a numbered
+   caption in the established index style. */
+figure {
+  margin: 2.25rem 0;
+  border: 1px solid var(--rule);
+  background: linear-gradient(180deg, var(--plate) 0%, var(--plate2) 100%);
+  box-shadow: var(--panel-shadow);
+  border-radius: var(--radius);
+  padding: 1rem;
+}
+figure img { width: 100%; height: auto; display: block; }
+figcaption { color: var(--muted); font-size: 0.88rem; margin-top: 0.7rem; }
+figcaption::before {
+  counter-increment: figure;
+  content: "Figure " counter(figure) " \2014 ";
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+/* The comparison section's single set selector: a "Set" label followed by a
+   segmented group of eight radio buttons. It picks which engine you are
+   hearing on the one shared transport below, not eight independent toggles --
+   hence role="radiogroup"/"radio" rather than plain buttons, with the same
+   arrow-key roving-tabindex behaviour that pattern implies (see main.js).
+   flex-wrap keeps the group from overflowing on narrow screens once it
+   wraps to a second row. */
+.set-selector { display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.75rem; }
+.set-selector-label {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+}
+.set-selector-group { display: inline-flex; flex-wrap: wrap; border: 1px solid var(--rule); border-radius: var(--radius); overflow: hidden; }
+.set-selector-group button {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  padding: 0.35rem 0.85rem;
+  border: none;
+  border-right: 1px solid var(--rule);
+  background: var(--plate);
+  color: var(--muted);
+  cursor: pointer;
+}
+.set-selector-group button:last-child { border-right: none; }
+.set-selector-group button:hover { color: var(--ink); }
+/* One of the two "this is what's meaningfully active" spots on the page
+   (the other is the transport's playing state below) that get a restrained
+   luminous ring rather than a flat highlight -- everywhere else stays flat
+   chrome, so these two keep their weight instead of the glow scattering. */
+.set-selector-group button[aria-selected="true"] {
+  color: var(--ink);
+  background: var(--bg);
+  box-shadow: 0 0 0 1px rgba(var(--accent-rgb), 0.4) inset, 0 0 10px -3px rgba(var(--accent-rgb), 0.65);
+}
+.set-selector-group button:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+}
+
+.set-tabs { display: flex; flex-wrap: wrap; gap: 0.1rem; margin-bottom: 1.5rem; border-bottom: 1px solid var(--rule); }
+.set-tabs button {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  padding: 0.5rem 0.9rem;
+  border: none;
+  border-bottom: 2px solid transparent;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+}
+.set-tabs button:hover { color: var(--ink); }
+.set-tabs button[aria-selected="true"] { color: var(--ink); border-bottom-color: var(--accent); }
+.set-panel[hidden] { display: none; }
+
+.clip { border-top: 1px solid var(--rule); padding-block: 1.2rem; }
+.clip-head { display: flex; justify-content: space-between; gap: 1rem; align-items: baseline; }
+.clip-source { color: var(--muted); font-family: var(--font-mono); font-size: 0.78rem; font-variant-numeric: tabular-nums; }
+.curve-canvas { width: 100%; height: 152px; display: block; margin-top: 0.5rem; cursor: pointer; }
+audio { width: 100%; margin-top: 0.5rem; }
+
+/* The custom transport replaces the native <audio controls> bar once
+   JavaScript runs (see setupCustomTransport in main.js), which removes the
+   `controls` attribute; this rule is what actually hides the now-bare
+   element so the canvas below reads as the only control surface. Without
+   JavaScript the attribute stays put, this selector never matches, and the
+   native bar remains the fallback. */
+audio:not([controls]) { display: none; }
+
+/* margin-top here is matched to the canvas's own margin-top plus the small
+   internal top inset the trace labels get inside the canvas (LABEL_TOP_INSET
+   in main.js): 0.75rem (12px) above the transport, 0.5rem (8px) canvas
+   margin + 4px label inset (12px) below it, so the whitespace above and
+   below the play button reads as symmetric even though the lower half of
+   that gap is drawn inside the canvas rather than expressed in CSS. */
+.transport {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  margin-top: 0.75rem;
+  flex-wrap: wrap;
+}
+
+/* The RPM/torque ranges sit here rather than inside the canvas, where they
+   competed for the same pixels as the grid rules and the axis tick labels.
+   Pushed to the right so the play button and the time readout keep the
+   left edge, and allowed to drop to its own line on a narrow screen. */
+.clip-legend {
+  margin-left: auto;
+  display: flex;
+  gap: 1rem;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+.legend-item { display: inline-flex; align-items: center; gap: 0.35em; }
+.legend-swatch { width: 10px; height: 2px; border-radius: 1px; flex: none; }
+.play-btn {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  padding: 0;
+  border: 1px solid var(--rule);
+  border-radius: 50%;
+  background: var(--plate);
+  color: var(--ink);
+  cursor: pointer;
+}
+.play-btn:hover { border-color: var(--ink); }
+.play-btn:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+.play-btn svg { fill: currentColor; }
+.play-btn[data-state="playing"] {
+  border-color: rgba(var(--accent-rgb), 0.6);
+  box-shadow: 0 0 9px -2px rgba(var(--accent-rgb), 0.7);
+}
+/* The button ships both icon paths and toggles which is visible by state,
+   rather than swapping markup on every play/pause -- cheaper and avoids a
+   flash of no-icon between the two. */
+.play-btn[data-state="paused"] .icon-pause { display: none; }
+.play-btn[data-state="playing"] .icon-play { display: none; }
+.time-readout {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+  min-width: 6.5ch;
+}
+
+.note { color: var(--muted); font-size: 0.88rem; }
+
+pre {
+  background: linear-gradient(180deg, var(--plate) 0%, var(--plate2) 100%);
+  box-shadow: var(--panel-shadow);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  padding: 0.9rem 1rem;
+  overflow-x: auto;
+  font-size: 0.86rem;
+}
+pre, code { font-family: var(--font-mono); }
+
+/* Links stay ink-on-rule chrome, all four equal -- none is a state or a
+   current selection, so none gets the accent hue. That colour is reserved
+   for the canvas traces, the nav's current-section underline and links in
+   prose. Each button carries a small inline glyph (Zenodo, a database mark
+   standing in for Hugging Face, GitHub, arXiv -- see index.html) sized via
+   currentColor so it always matches the button's own text colour, in both
+   themes and through hover/focus.
+
+   A four-column grid rather than flex: sizing by content left the row
+   ragged and short of the column's own width. Grid columns are equal
+   fractions of the same width regardless of label length, so all four
+   buttons match and the row spans the full column edge to edge. Narrower
+   screens drop to two columns (then one) so a longer label like "Code
+   (analysis)" gets to wrap onto a second line instead of being squeezed
+   into an ever-thinner cell. */
+.links { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.6rem; margin-block: 1.75rem; }
+.links a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5em;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  padding: 0.6rem 0.5rem;
+  text-decoration: none;
+  color: var(--ink);
+  text-align: center;
+  /* All four share one grid column width, so the longest label decides the
+     row's height. Left to wrap, "Code (analysis)" alone ran to two lines and
+     forced every button to twice the height it needed. Keeping the labels on
+     one line lets the row sit at its natural height and keeps the four
+     baselines aligned. */
+  white-space: nowrap;
+  font-size: 0.94rem;
+}
+.links a:hover { border-color: var(--ink); }
+
+/* Each glyph's own viewBox is its tight bounding box, not a padded
+   design-em-square, and the four source marks span very different aspect
+   ratios (Zenodo wide and short, arXiv tall, GitHub and the database mark
+   near-square). A shared 1em box with the SVG default (xMidYMid meet)
+   already fits each one without distortion; these per-icon sizes only
+   correct the resulting optical weight so all four read as the same size
+   next to the label text. */
+.link-icon { flex: none; width: 1em; height: 1em; }
+.links a[href*="huggingface.co"] .link-icon { width: 0.95em; height: 0.95em; }
+.links a[href*="zenodo.org"] .link-icon { width: 1.25em; height: 1.25em; }
+.links a[href*="arxiv.org"] .link-icon { width: 1.05em; height: 1.05em; }
+.links a[href*="github.com"] .link-icon { width: 1em; height: 1em; }
+
+/* Closing colophon. Deliberately no "last updated" date: a hand-maintained
+   one is wrong within a month, and the version + DOI below already answer
+   what a reader actually wants to know -- which release of the dataset this
+   page describes. Reuses the downloads strip's labelled-value row rather
+   than inventing a second idiom for the same job, so the page opens and
+   closes on the same visual grammar. */
+#page-footer { max-width: 76ch; margin: 0 auto; padding: 0 1.25rem 4rem; }
+.footer-inner { border-top: 1px solid var(--rule); padding-top: 1.5rem; }
+.footer-authors {
+  font-family: var(--font-heading);
+  color: var(--muted);
+  margin: 0 0 1.1rem;
+}
+.footer-authors a { color: var(--ink); }
+.footer-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem 1.5rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.footer-meta li {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  padding-right: 1.5rem;
+  border-right: 1px solid var(--rule);
+}
+.footer-meta li:last-child { padding-right: 0; border-right: none; }
+.footer-label {
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+.footer-value {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  font-variant-numeric: tabular-nums;
+}
+
+@media (max-width: 34rem) {
+  .clip-head { flex-direction: column; gap: 0.2rem; }
+  .links { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 20rem) {
+  .links { grid-template-columns: 1fr; }
+}
