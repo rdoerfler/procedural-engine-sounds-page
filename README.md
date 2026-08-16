@@ -3,20 +3,16 @@
 ### https://rdoerfler.github.io/procedural-engine-sounds-page/
 
 This repo hosts the landing page for the Procedural Engine Sounds Dataset.
-The dataset itself lives elsewhere:
+The dataset itself, paper and code can be found here:
 
 - Dataset: [Hugging Face](https://huggingface.co/datasets/rdoerfler/procedural-engine-sounds)
 - Archived release: [Zenodo, DOI 10.5281/zenodo.16883336](https://doi.org/10.5281/zenodo.16883336)
 - Paper: [arXiv:2603.07584](https://arxiv.org/abs/2603.07584)
 - Analysis code: [rdoerfler/engine-order-analysis](https://github.com/rdoerfler/engine-order-analysis)
 
-It is procedurally synthesised engine audio with sample-accurate RPM and torque
-annotations, across eight capture configurations and three engines. Released
-under [CC BY-NC 4.0](https://creativecommons.org/licenses/by-nc/4.0/) —
-attribution, non-commercial. Engine audio with labels you can actually trust is
-hard to come by, so it seemed more useful shared than sitting on my drive. If
-you end up building something with it, I'd be glad to hear about it — there's a
-discussions tab on the Hugging Face page.
+Released under [CC BY-NC 4.0](https://creativecommons.org/licenses/by-nc/4.0/) — attribution, non-commercial. 
+
+If you end up building something with this dataset, I'd be glad to hear about it — there's a discussions tab on the Hugging Face page.
 
 If you use the dataset, please cite it:
 
@@ -32,9 +28,3 @@ If you use the dataset, please cite it:
   url          = {https://doi.org/10.5281/zenodo.16883336}
 }
 ```
-
----
-
-The page is plain HTML, CSS and JavaScript with no build step — GitHub Pages
-serves it from `main`. Raleway is bundled under the SIL Open Font License, see
-`assets/fonts/OFL.txt`.
