@@ -2,3 +2,5 @@
 ._*
 *.icloud
 .*.icloud
+__pycache__/
+*.pyc

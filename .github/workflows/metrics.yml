@@ -1,0 +1,52 @@
+name: refresh download metrics
+
+# This workflow only ever runs in the deploy repo
+# (rdoerfler/procedural-engine-sounds-page), which is the only one of the two
+# repos with a GitHub remote. The copy here is the source of truth --
+# tools/sync_deploy.sh pushes it across -- and is inert in this repo.
+
+on:
+  schedule:
+    # Mondays, 06:00 UTC. The counters move slowly; weekly is plenty.
+    - cron: "0 6 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pages: write
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Fetch counts
+        run: python tools/fetch_metrics.py
+      - name: Commit if changed
+        id: commit
+        run: |
+          if git diff --quiet -- assets/metrics.json; then
+            echo "counts unchanged"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add assets/metrics.json
+          git commit -m "refresh download counts"
+          git push
+          echo "pushed=true" >> "$GITHUB_OUTPUT"
+      # Pages is built from the branch here, not from a workflow, and a push
+      # made with GITHUB_TOKEN does not reliably wake that builder. Asking for
+      # a build outright is what gets the refreshed counts onto the live page.
+      # Soft-failed on purpose: if the branch push already triggered a build,
+      # or Pages is later moved to an Actions source, the commit above still
+      # stands and the next ordinary push publishes it.
+      - name: Rebuild Pages
+        if: steps.commit.outputs.pushed == 'true'
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh api --method POST "repos/${{ github.repository }}/pages/builds"

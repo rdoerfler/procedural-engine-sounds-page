@@ -1,8 +1,8 @@
 {
-  "retrieved_at": "2026-08-15T17:01:16.506684+00:00",
+  "retrieved_at": "2026-08-21T14:02:18.050848+00:00",
   "totals": {
-    "downloads_all_time": 6285,
-    "hugging_face_downloads_last_30_days": 520
+    "downloads_all_time": 6455,
+    "hugging_face_downloads_last_30_days": 624
   },
   "metric_notes": {
     "downloads_all_time": "Sum of the all-time download counters reported by each release platform. It is not deduplicated across platforms.",
@@ -12,24 +12,24 @@
     "Hugging Face (original)": {
       "url": "https://huggingface.co/api/datasets/rdoerfler/procedural-engine-sounds?expand=downloads&expand=downloadsAllTime",
       "metrics": {
-        "downloads_last_30_days": 427,
-        "downloads_all_time": 2245
+        "downloads_last_30_days": 527,
+        "downloads_all_time": 2392
       }
     },
     "Hugging Face (copy)": {
       "url": "https://huggingface.co/api/datasets/huggingbear12/procedural-engine-sounds?expand=downloads&expand=downloadsAllTime",
       "metrics": {
-        "downloads_last_30_days": 93,
-        "downloads_all_time": 3972
+        "downloads_last_30_days": 97,
+        "downloads_all_time": 3992
       }
     },
     "Zenodo": {
       "url": "https://zenodo.org/api/records/16883336",
       "metrics": {
-        "downloads_all_time": 68,
-        "unique_downloads_all_time": 43,
-        "views_all_time": 332,
-        "unique_views_all_time": 299
+        "downloads_all_time": 71,
+        "unique_downloads_all_time": 45,
+        "views_all_time": 352,
+        "unique_views_all_time": 312
       }
     }
   }
